@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" th:href="@{/css/name.css}"/>
+    <meta name="theme-color" content="#563d7c">
+</head>
+<body class="text-center">
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+        <h3>Planning Poker</h3>
+    </header>
+    <main role="main" class="inner cover">
+        <form class="form-signin" th:action="@{name}" method="POST" th:object="${user}">
+            <h1 class="h4 mb-3 font-weight-normal">Please tell us your name</h1>
+            <label for="inputName" class="sr-only">Your name</label>
+            <input type="text" id="inputName" th:field="*{userName}" name="name" class="form-control text-center" placeholder="Your name" required="" autofocus="">
+            <button class="btn btn-primary btn-block" type="submit">Submit</button>
+        </form>
+    </main>
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>Planning Poker by <a th:href="@{https://grobocop.com}">Grobocop</a> 2020</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

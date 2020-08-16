@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Planning Poker</title>
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <meta name="theme-color" content="#563d7c">
+</head>
+<body class="text-center">
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto">
+        <h3>Planning Poker</h3>
+    </header>
+    <main role="main" class="inner cover">
+
+        <div>
+            <h1>Planning Poker</h1>
+            <p class="lead">Planning Poker is an application for estimating effort of development goals.</p>
+            <a th:href="@{/poker/newSession}">
+                <button class="btn btn-lg btn-primary m-2">
+                    Start new session
+                </button>
+            </a>
+            <div>
+                <p class="lead">Or find existing session:</p>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col-8">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Session ID">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">Find</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col"></div>
+            </div>
+
+        </div>
+    </main>
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>Planning Poker by <a th:href="@{https://grobocop.com}">Grobocop</a> 2020</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
