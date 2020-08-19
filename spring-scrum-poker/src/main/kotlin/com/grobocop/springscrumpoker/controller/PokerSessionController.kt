@@ -1,6 +1,6 @@
 package com.grobocop.springscrumpoker.controller
 
-import com.grobocop.springscrumpoker.data.UserDTO
+import com.grobocop.springscrumpoker.data.UserEstimateDTO
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
@@ -39,14 +39,14 @@ class PokerSessionController {
             response: HttpServletResponse,
             model: Model): String {
         model.addAttribute("id", id)
-        model.addAttribute("user", UserDTO())
+        model.addAttribute("user", UserEstimateDTO())
         return "poker/name"
     }
 
     @PostMapping("/{id}/name")
     fun postName(
             @PathVariable id: String,
-            @ModelAttribute user: UserDTO,
+            @ModelAttribute user: UserEstimateDTO,
             response: HttpServletResponse,
             model: Model): String {
         if (user.userName.isNotBlank()) {
@@ -54,7 +54,7 @@ class PokerSessionController {
             return "redirect:/poker/${id}"
         }
         model.addAttribute("id", id)
-        model.addAttribute("user", UserDTO())
+        model.addAttribute("user", UserEstimateDTO())
         return "poker/name"
     }
 }
