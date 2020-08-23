@@ -1,6 +1,10 @@
 package com.grobocop.springscrumpoker
 
+import com.grobocop.springscrumpoker.controller.PokerSessionService
+import com.grobocop.springscrumpoker.data.PokerSessionDTO
 import com.grobocop.springscrumpoker.data.UserEstimateDTO
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -13,15 +17,30 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import javax.servlet.http.Cookie
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 class PokerSessionControllerTest {
 
     @Autowired
     private lateinit var mock: MockMvc
 
-    private val sessionId = "session"
+    @Autowired
+    private lateinit var service: PokerSessionService
 
+    private var sessionId: String = ""
+
+
+    @BeforeAll
+    fun prepareTest() {
+        sessionId = service.createSession(
+                PokerSessionDTO("", "Test Session", false)
+        ).id
+    }
+
+    @AfterAll
+    fun cleanUp() {
+        service.deleteSession(sessionId)
+    }
 
     @Test
     fun getSessionWithCookieTest() {

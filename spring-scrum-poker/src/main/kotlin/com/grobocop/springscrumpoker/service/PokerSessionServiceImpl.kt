@@ -2,6 +2,7 @@ package com.grobocop.springscrumpoker.service
 
 import com.grobocop.springscrumpoker.controller.PokerSessionService
 import com.grobocop.springscrumpoker.data.PokerSessionDTO
+import com.grobocop.springscrumpoker.data.PokerSessionNotFound
 import com.grobocop.springscrumpoker.data.UserEstimateDTO
 import com.grobocop.springscrumpoker.data.entity.PokerSession
 import com.grobocop.springscrumpoker.data.repository.PokerSessionRepository
@@ -34,29 +35,34 @@ class PokerSessionServiceImpl : PokerSessionService {
         )
     }
 
-    override fun readSession(id: String): PokerSessionDTO {
-        val idInt = id.toInt()
-        val sessionOptional = repository.findById(idInt)
-        if (sessionOptional.isEmpty) {
-            throw NotFoundException("Poker session with id: $idInt not found")
-        } else {
-            val result = sessionOptional.get()
-            return PokerSessionDTO(
-                    id = result.id.toString().padStart(10, '0'),
-                    name = result.name,
-                    showEstimates = result.showEstimates,
-                    userEstimates = result.userEstimates.map {
-                        UserEstimateDTO(it)
-                    }
-            )
+    override fun readSession(id: String): PokerSessionDTO? {
+        try {
+            val idInt = Integer.parseInt(id)
+            val sessionOptional = repository.findById(idInt)
+            return if (sessionOptional.isEmpty) {
+                null
+            } else {
+                val result = sessionOptional.get()
+                PokerSessionDTO(
+                        id = result.id.toString().padStart(10, '0'),
+                        name = result.name,
+                        showEstimates = result.showEstimates,
+                        userEstimates = result.userEstimates.map {
+                            UserEstimateDTO(it)
+                        }
+                )
+            }
+        } catch (e: NumberFormatException) {
+            return null
         }
+
     }
 
     override fun updateSession(dto: PokerSessionDTO): PokerSessionDTO {
         val idInt = dto.id.toInt()
         val findById = repository.findById(idInt)
         if (findById.isEmpty) {
-            throw NotFoundException("Poker session with id: $idInt not found")
+            throw PokerSessionNotFound()
         } else {
             val toSave = findById.get()
             toSave.name = dto.name
@@ -77,8 +83,8 @@ class PokerSessionServiceImpl : PokerSessionService {
     override fun deleteSession(id: String) {
         val idInt = id.toInt()
         val findById = repository.findById(idInt)
-        if(findById.isEmpty){
-            throw NotFoundException("Poker session with id: $idInt not found")
+        if (findById.isEmpty) {
+            throw PokerSessionNotFound()
         } else {
             repository.deleteById(idInt)
         }

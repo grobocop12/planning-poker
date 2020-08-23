@@ -2,12 +2,9 @@ package com.grobocop.springscrumpoker
 
 import com.grobocop.springscrumpoker.controller.PokerSessionService
 import com.grobocop.springscrumpoker.data.PokerSessionDTO
-import javassist.NotFoundException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import java.util.*
 
 @SpringBootTest
 class PokerSessionServiceTest {
@@ -16,6 +13,7 @@ class PokerSessionServiceTest {
     private lateinit var service: PokerSessionService
 
     private var id: String? = null
+
 
     @Test
     fun runTests() {
@@ -44,7 +42,7 @@ class PokerSessionServiceTest {
     private fun readSessionTest() {
         id?.let {
             val let = service.readSession(it)
-            assert(let.id == it)
+            assert(let?.id == it)
         }
     }
 
@@ -65,14 +63,12 @@ class PokerSessionServiceTest {
     }
 
     private fun deleteSessionTest() {
-        id?.let{
+        id?.let {
             service.deleteSession(it)
-            try {
-                service.readSession(it)
+            service.readSession(it)?.let {
                 assert(false)
-            } catch (e: NotFoundException) {
-                assert(true)
             }
+            assert(true)
         }
     }
 
