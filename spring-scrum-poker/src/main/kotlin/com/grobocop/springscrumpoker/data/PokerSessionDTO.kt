@@ -4,5 +4,5 @@ class PokerSessionDTO(
         var id : String = "",
         var name: String = "",
         var showEstimates : Boolean = false,
-        var userEstimates : List<UserEstimateDTO> = emptyList()
+        var userEstimates : MutableList<UserEstimateDTO> = ArrayList()
 )

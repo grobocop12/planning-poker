@@ -3,7 +3,6 @@ package com.grobocop.springscrumpoker.controller
 import com.grobocop.springscrumpoker.data.PokerSessionDTO
 import com.grobocop.springscrumpoker.data.PokerSessionNotFound
 import com.grobocop.springscrumpoker.data.UserEstimateDTO
-import javassist.NotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -22,7 +21,7 @@ class PokerSessionController {
     @GetMapping("/createNew")
     fun getNewSession(model: Model): String {
         val pokerSessionDTO = PokerSessionDTO()
-        model.addAttribute("session",pokerSessionDTO)
+        model.addAttribute("session", pokerSessionDTO)
         return "poker/createNew"
     }
 
@@ -30,7 +29,7 @@ class PokerSessionController {
     fun postNewSession(
             @ModelAttribute pokerSessionDTO: PokerSessionDTO,
             model: Model): String {
-        if (pokerSessionDTO.name.isNotBlank() ) {
+        if (pokerSessionDTO.name.isNotBlank()) {
             val newSession = pokerSessionService.createSession(pokerSessionDTO)
             return "redirect:${newSession.id}"
         }
@@ -43,8 +42,8 @@ class PokerSessionController {
             @PathVariable id: String,
             request: HttpServletRequest,
             model: Model): String {
-        val readSession = pokerSessionService.readSession(id)
-        readSession?.let{
+        val readSession = pokerSessionService.getSession(id)
+        readSession?.let {
             val username = request.cookies
                     ?.asList()
                     ?.stream()
@@ -78,8 +77,10 @@ class PokerSessionController {
             response: HttpServletResponse,
             model: Model): String {
         if (user.userName.isNotBlank()) {
-            user.userName = user.userName.replace(' ','_')
-            response.addCookie(Cookie("username_${id}", user.userName))
+            user.userName = user.userName.replace(' ', '_')
+            val addedUser = pokerSessionService.addUserToSession(id, user)
+            response.addCookie(Cookie("username_${id}", addedUser.userName))
+            response.addCookie(Cookie("user_id_${id}", addedUser.id.toString()))
             return "redirect:/poker/${id}"
         }
         model.addAttribute("id", id)

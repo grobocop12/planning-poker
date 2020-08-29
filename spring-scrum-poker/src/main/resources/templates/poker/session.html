@@ -6,23 +6,16 @@
     <title th:text="${id}"></title>
     <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <meta name="theme-color" content="#563d7c">
 </head>
 <body class="text-center">
 <script>
-    document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    let cookie = {};
-    console.log(document.cookie.split(';'));
-    document.cookie.split(';').forEach((parameter) => {
-        const key = parameter.split('=')[0];
-        const value = parameter.split('=')[1];
-        cookie[key] = value;
-    })
-    if (typeof cookie['username_[[${id}]]'] === "undefined") {
-        //alert.call('username_[[${id}]]');
-        window.location.href = window.location + "/name";
-    }
+    const id = '[[${id}]]';
 </script>
+<script th:src="@{/js/app.js}"></script>
 <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
     <header class="masthead mb-auto">
         <h3>Planning Poker</h3>

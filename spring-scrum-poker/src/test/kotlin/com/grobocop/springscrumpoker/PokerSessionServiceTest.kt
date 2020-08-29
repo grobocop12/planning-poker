@@ -30,7 +30,7 @@ class PokerSessionServiceTest {
                 id = "",
                 name = name,
                 showEstimates = showEstimates,
-                userEstimates = emptyList()
+                userEstimates = ArrayList()
         )
         val createSession = service.createSession(sessionDTO)
         this.id = createSession.id
@@ -41,7 +41,7 @@ class PokerSessionServiceTest {
 
     private fun readSessionTest() {
         id?.let {
-            val let = service.readSession(it)
+            val let = service.getSession(it)
             assert(let?.id == it)
         }
     }
@@ -65,7 +65,7 @@ class PokerSessionServiceTest {
     private fun deleteSessionTest() {
         id?.let {
             service.deleteSession(it)
-            service.readSession(it)?.let {
+            service.getSession(it)?.let {
                 assert(false)
             }
             assert(true)
