@@ -9,4 +9,5 @@ interface PokerSessionService {
     fun updateSession(dto: PokerSessionDTO): PokerSessionDTO
     fun deleteSession(id: String)
     fun addUserToSession(id: String, user: UserEstimateDTO) : UserEstimateDTO
+    fun setSessionShowingState(roomId: String, state: Boolean) : Boolean
 }

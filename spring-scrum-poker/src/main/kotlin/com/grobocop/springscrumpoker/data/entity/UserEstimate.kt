@@ -12,10 +12,10 @@ data class UserEstimate(
        @Id
        @GeneratedValue(
                strategy = GenerationType.AUTO,
-               generator = "native"
+               generator = "user_estimate_generator"
        )
        @GenericGenerator(
-               name = "native",
+               name = "user_estimate_generator",
                strategy = "native"
        )
        var id: Int = 0,
@@ -28,5 +28,4 @@ data class UserEstimate(
        var created: Date = Date(),
        @UpdateTimestamp
        var modified: Date = Date()
-) {
-}
+)

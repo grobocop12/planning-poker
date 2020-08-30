@@ -55,6 +55,8 @@ class PokerSessionController {
                     ?.value
             if (username.isNullOrBlank()) return "redirect:$id/name"
             model.addAttribute("id", id)
+            model.addAttribute("pokerSession", it)
+            it.userEstimates[0].estimate
             return "poker/session"
         }
         throw PokerSessionNotFound()

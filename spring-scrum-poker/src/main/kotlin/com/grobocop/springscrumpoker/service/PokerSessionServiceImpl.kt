@@ -107,9 +107,15 @@ class PokerSessionServiceImpl : PokerSessionService {
             throw PokerSessionNotFound()
         } else {
             val get = findById.get()
-            val userEstimate = UserEstimate(username = user.userName,
+            val userEstimate = UserEstimate(
+                    username = user.userName,
                     pokerSession = get)
             return UserEstimateDTO(userEstimateRepository.save(userEstimate))
         }
+    }
+
+    override fun setSessionShowingState(roomId: String, state: Boolean): Boolean {
+        pokerSessionRepository.updateSessionShowingState(state, roomId.toInt())
+        return pokerSessionRepository.getSessionShowingState(roomId.toInt())
     }
 }

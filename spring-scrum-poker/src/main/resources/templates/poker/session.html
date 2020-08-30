@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${id}"></title>
+    <title th:text="${pokerSession.name}"></title>
     <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <script src="/webjars/jquery/jquery.min.js"></script>
@@ -21,7 +21,22 @@
         <h3>Planning Poker</h3>
     </header>
     <main role="main" class="inner cover">
-        <h1 th:text="${id}"></h1>
+        <div class="m-5">
+            <button class="btn btn-primary" th:id="showButton" id="showButton">Show estimates</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Estimation</th>
+                </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
     </main>
     <footer class="mastfoot mt-auto">
         <div class="inner">

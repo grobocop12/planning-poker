@@ -2,6 +2,7 @@ package com.grobocop.springscrumpoker.controller
 
 import com.grobocop.springscrumpoker.data.UserEstimateDTO
 import com.grobocop.springscrumpoker.websockets.EstimatesList
+import com.grobocop.springscrumpoker.websockets.ShowingState
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,11 +33,18 @@ class WebsocketController {
             if (!it.userEstimates.any { element -> element.id == user.id && element.userName == user.userName }) {
                 service.addUserToSession(roomId, user)
                 val session = service.getSession(roomId)
-                return EstimatesList(session?.userEstimates?.toList() ?: emptyList())
-                //messagingTemplate.convertAndSend("/poker/listOfUsers/$roomId", estimatesList)
+                return EstimatesList(session?.showEstimates ?: false, session?.userEstimates?.toList() ?: emptyList())
             }
-            return EstimatesList(it.userEstimates.toList())
+            return EstimatesList(it.showEstimates, it.userEstimates.toList())
         }
         return null
+    }
+
+    @MessageMapping("/poker/{roomId}/show")
+    @SendTo("/broker/poker/{roomId}/show")
+    fun showEstimates(@Payload showingState: ShowingState,
+                      @DestinationVariable roomId: String): ShowingState {
+        val state = service.setSessionShowingState(roomId, showingState.state)
+        return ShowingState(state)
     }
 }
