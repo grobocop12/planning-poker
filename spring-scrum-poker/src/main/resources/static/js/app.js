@@ -53,8 +53,15 @@ const stompClient = Stomp.over(socket);
 stompClient.connect({}, () => {
     stompClient.subscribe(`/broker/poker/${id}/listOfUsers`, (msg) => {
         estimates = JSON.parse(msg["body"]);
-        refreshEstimates();
-        setShowButtonDescription();
+        const temp = estimates['estimates'].filter((estimate) => {
+            return estimate.id === userId
+        })
+        if (temp.length === 1) {
+            refreshEstimates();
+            setShowButtonDescription();
+        } else {
+            location.reload();
+        }
     });
     stompClient.subscribe(`/broker/poker/${id}/show`, (msg) => {
         const state = JSON.parse(msg["body"]);
