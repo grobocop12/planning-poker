@@ -21,7 +21,7 @@ data class UserEstimate(
        var id: Int = 0,
        @NotBlank
        var username: String = "",
-       var estimate: Int? = null,
+       var estimate: String? = null,
        @ManyToOne(fetch = FetchType.LAZY)
        var pokerSession: PokerSession? = null,
        @CreationTimestamp

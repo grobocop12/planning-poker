@@ -4,6 +4,7 @@ import com.grobocop.springscrumpoker.controller.PokerSessionService
 import com.grobocop.springscrumpoker.data.PokerSessionDTO
 import com.grobocop.springscrumpoker.data.PokerSessionNotFound
 import com.grobocop.springscrumpoker.data.UserEstimateDTO
+import com.grobocop.springscrumpoker.data.UserNotFoundException
 import com.grobocop.springscrumpoker.data.entity.PokerSession
 import com.grobocop.springscrumpoker.data.entity.UserEstimate
 import com.grobocop.springscrumpoker.data.repository.PokerSessionRepository
@@ -114,8 +115,77 @@ class PokerSessionServiceImpl : PokerSessionService {
         }
     }
 
+    override fun updateUser(sessionId: String, user: UserEstimateDTO): UserEstimateDTO {
+        val idInt = sessionId.toInt()
+        val findById = pokerSessionRepository.findById(idInt)
+        if (findById.isEmpty) {
+            throw PokerSessionNotFound()
+        } else {
+            findById.get().let {
+                val newUser = UserEstimate(
+                        id = user.id,
+                        username = user.userName,
+                        estimate = user.estimate,
+                        pokerSession = it,
+                        created = Date(),
+                        modified = Date()
+                )
+                val save = userEstimateRepository.save(newUser)
+                return UserEstimateDTO(save)
+            }
+        }
+    }
+
     override fun setSessionShowingState(roomId: String, state: Boolean): Boolean {
         pokerSessionRepository.updateSessionShowingState(state, roomId.toInt())
         return pokerSessionRepository.getSessionShowingState(roomId.toInt())
+    }
+
+    override fun updateEstimate(userId: Int, userEstimate: String?): UserEstimateDTO {
+        val findById = userEstimateRepository.findById(userId)
+        if (findById.isEmpty) {
+            throw UserNotFoundException()
+        } else {
+            val get = findById.get()
+            get.estimate = userEstimate
+            get.modified = Date()
+            return UserEstimateDTO(userEstimateRepository.save(get))
+        }
+    }
+
+    override fun deleteEstimates(roomId: String): PokerSessionDTO {
+        val toInt = roomId.toInt()
+        val findById = pokerSessionRepository.findById(toInt).get()
+        val estimatesToSave = ArrayList<UserEstimate>()
+        val estimatesToDelete = ArrayList<UserEstimate>()
+        val modified = Date()
+        val timeFrom30MinutesAgo = getTimeFrom30MinutesAgo()
+        findById.userEstimates.forEach {
+            if (it.modified.before(timeFrom30MinutesAgo)) {
+                estimatesToDelete.add(it)
+            } else {
+                it.estimate = null
+                it.modified = modified
+                estimatesToSave.add(it)
+            }
+        }
+        userEstimateRepository.deleteAll(estimatesToDelete)
+        findById.userEstimates = estimatesToSave
+        findById.modified = modified
+        val save = pokerSessionRepository.save(findById)
+        return PokerSessionDTO(
+                id = save.id.toString().padStart(10, '0'),
+                name = save.name,
+                showEstimates = save.showEstimates,
+                userEstimates = save.userEstimates.map {
+                    UserEstimateDTO(it)
+                }.toMutableList()
+        )
+    }
+
+    private fun getTimeFrom30MinutesAgo(): Date {
+        val instance = Calendar.getInstance()
+        instance.add(Calendar.MINUTE, -1)
+        return instance.time
     }
 }

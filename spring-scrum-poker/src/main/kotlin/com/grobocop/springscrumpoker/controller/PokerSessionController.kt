@@ -16,7 +16,11 @@ import javax.servlet.http.HttpServletResponse
 class PokerSessionController {
 
     @Autowired
-    lateinit var pokerSessionService: PokerSessionService
+    private lateinit var pokerSessionService: PokerSessionService
+
+    //expires after 31 days
+    private val cookieExpirationTime: Int = 60 * 60 * 24 * 31
+    private val cookiePath = "/poker"
 
     @GetMapping("/createNew")
     fun getNewSession(model: Model): String {
@@ -41,23 +45,42 @@ class PokerSessionController {
     fun getSession(
             @PathVariable id: String,
             request: HttpServletRequest,
+            response: HttpServletResponse,
             model: Model): String {
         val readSession = pokerSessionService.getSession(id)
         readSession?.let {
-            val username = request.cookies
-                    ?.asList()
+            var usernameCookie: Cookie? = null
+            var userIdCookie: Cookie? = null
+            val cookies = request.cookies?.asList()
+            val optionalUsernameCookie = cookies
                     ?.stream()
-                    ?.filter {
-                        it.name == "username_$id"
-                    }
+                    ?.filter { cookie -> cookie.name == "username_$id" }
                     ?.findFirst()
-                    ?.get()
-                    ?.value
-            if (username.isNullOrBlank()) return "redirect:$id/name"
-            model.addAttribute("id", id)
-            model.addAttribute("pokerSession", it)
-            it.userEstimates[0].estimate
-            return "poker/session"
+            val optionalUserIdCookie = cookies
+                    ?.stream()
+                    ?.filter { cookie -> cookie.name == "user_id_${id}" }
+                    ?.findFirst()
+            if (optionalUsernameCookie?.isPresent == true) usernameCookie = optionalUsernameCookie.get()
+            if (optionalUserIdCookie?.isPresent == true) userIdCookie = optionalUserIdCookie.get()
+            if (userIdCookie == null || usernameCookie == null ||
+                    usernameCookie.value.isNullOrBlank() || userIdCookie.value.isNullOrBlank()) {
+                return "redirect:$id/name"
+            } else if (it.userEstimates.any { element ->
+                        element.id.toString() == userIdCookie.value && element.userName == usernameCookie.value
+                    }) {
+                resetCookie(response, usernameCookie, usernameCookie.value)
+                resetCookie(response, userIdCookie, userIdCookie.value)
+                model.addAttribute("id", id)
+                model.addAttribute("pokerSession", it)
+                return "poker/session"
+            } else {
+                val newUser = pokerSessionService.addUserToSession(id, UserEstimateDTO(userName = usernameCookie.value))
+                resetCookie(response, usernameCookie, newUser.userName)
+                resetCookie(response, userIdCookie, newUser.id)
+                model.addAttribute("id", id)
+                model.addAttribute("pokerSession", it)
+                return "poker/session"
+            }
         }
         throw PokerSessionNotFound()
     }
@@ -81,12 +104,29 @@ class PokerSessionController {
         if (user.userName.isNotBlank()) {
             user.userName = user.userName.replace(' ', '_')
             val addedUser = pokerSessionService.addUserToSession(id, user)
-            response.addCookie(Cookie("username_${id}", addedUser.userName))
-            response.addCookie(Cookie("user_id_${id}", addedUser.id.toString()))
+            addCookie(response, "username_${id}", addedUser.userName)
+            addCookie(response, "user_id_${id}", addedUser.id.toString())
             return "redirect:/poker/${id}"
         }
         model.addAttribute("id", id)
         model.addAttribute("user", UserEstimateDTO())
         return "poker/name"
+    }
+
+    private fun addCookie(response: HttpServletResponse, cookieName: String, value: Any) {
+        val cookie = Cookie(cookieName, value.toString())
+        cookie.path = cookiePath
+        cookie.maxAge = cookieExpirationTime
+        response.addCookie(cookie)
+    }
+
+    private fun resetCookie(response: HttpServletResponse, cookie: Cookie, newValue: Any) {
+        val cookieName = cookie.name
+        cookie.maxAge = 0
+        response.addCookie(cookie)
+        val newCookie = Cookie(cookieName, newValue.toString())
+        newCookie.maxAge = cookieExpirationTime
+        newCookie.path = cookiePath
+        response.addCookie(newCookie)
     }
 }

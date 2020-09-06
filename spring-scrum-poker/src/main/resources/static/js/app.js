@@ -2,9 +2,8 @@ let cookie = {};
 let estimates = {};
 const cookieUsername = `username_${id}`;
 const cookieUserId = `user_id_${id}`;
-const buttonDescriptionShow = 'Show estimates';
-const buttonDescriptionHide = 'Hide estimates';
-var button = $('#showButton');
+const buttonDescriptionShow = 'Show';
+const buttonDescriptionHide = 'Hide';
 
 document.cookie.split(';').forEach((parameter) => {
     const key = parameter.split('=')[0].trim();
@@ -23,16 +22,18 @@ function refreshEstimates() {
     let i = 1;
     estimates["estimates"].forEach((estimate) => {
         if (estimates["showEstimates"] === true) {
-            tableBody.append(`<tr>
+            tableBody.append(
+`<tr>
 <td>${i}</td>
 <td>${estimate['userName']}</td>
 <td>${estimate['estimate'] === null ? '' : estimate['estimate']}</td>
 </tr>`)
         } else {
-            tableBody.append(`<tr>
+            tableBody.append(
+`<tr>
 <td>${i}</td>
 <td>${estimate['userName']}</td>
-<td>-</td>
+<td>${estimate['estimate'] === null ? '' : '-'}</td>
 </tr>`)
         }
         i++;
@@ -41,15 +42,15 @@ function refreshEstimates() {
 
 function setShowButtonDescription() {
     if (estimates['showEstimates'] === true) {
-        button.text(`${buttonDescriptionHide}`);
+        $('#showButton').html(`${buttonDescriptionHide}`);
     } else {
-        button.text(`${buttonDescriptionShow}`);
+        $('#showButton').html(`${buttonDescriptionShow}`);
     }
 }
 
 const socket = new SockJS('/app-socket');
 const stompClient = Stomp.over(socket);
-stompClient.connect({}, (frame) => {
+stompClient.connect({}, () => {
     stompClient.subscribe(`/broker/poker/${id}/listOfUsers`, (msg) => {
         estimates = JSON.parse(msg["body"]);
         refreshEstimates();
@@ -58,6 +59,17 @@ stompClient.connect({}, (frame) => {
     stompClient.subscribe(`/broker/poker/${id}/show`, (msg) => {
         const state = JSON.parse(msg["body"]);
         estimates['showEstimates'] = state["state"];
+        refreshEstimates();
+        setShowButtonDescription();
+    });
+    stompClient.subscribe(`/broker/poker/${id}/vote`, (msg) => {
+        const vote = JSON.parse(msg["body"]);
+        const toChange = estimates['estimates'].find(obj => {
+            return obj.id === vote['id']
+        });
+        if (typeof toChange !== "undefined") {
+            toChange.estimate = vote.estimate
+        }
         refreshEstimates();
         setShowButtonDescription();
     });
@@ -70,5 +82,15 @@ $(document).ready(() => {
         if (typeof estimates['showEstimates'] !== "undefined") {
             stompClient.send(`/app/poker/${id}/show`, {}, JSON.stringify({'state': !estimates['showEstimates']}))
         }
-    })
+    });
+    $('#deleteButton').click(()=> {
+        stompClient.send(`/app/poker/${id}/delete`,{},{});
+    });
+    const cards = $('.poker-card');
+    cards.each((i) => {
+        cards[i].onclick = () => {
+            const attr = cards[i].attributes['data-id']['value'];
+            stompClient.send(`/app/poker/${id}/vote`, {}, JSON.stringify({'userId': userId, 'userEstimate': attr}))
+        }
+    });
 })
