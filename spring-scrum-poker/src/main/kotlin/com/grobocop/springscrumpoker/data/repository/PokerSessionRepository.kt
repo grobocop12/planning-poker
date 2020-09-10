@@ -17,4 +17,7 @@ interface PokerSessionRepository : CrudRepository<PokerSession, Int> {
 
     @Query("select p.showEstimates from PokerSession p where p.id = :sessionId")
     fun getSessionShowingState(@Param("sessionId") sessionId: Int): Boolean
+
+    @Query("select p from PokerSession p where p.name like concat('%',:name,'%')")
+    fun findByName(name: String): Iterable<PokerSession>
 }

@@ -28,4 +28,8 @@ data class UserEstimate(
        var created: Date = Date(),
        @UpdateTimestamp
        var modified: Date = Date()
-)
+){
+       override fun toString(): String {
+              return "UserEstimate(id=$id, username='$username', estimate=$estimate, created=$created, modified=$modified)"
+       }
+}

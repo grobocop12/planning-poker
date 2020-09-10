@@ -183,6 +183,20 @@ class PokerSessionServiceImpl : PokerSessionService {
         )
     }
 
+    override fun searchSessionByName(sessionName: String): List<PokerSessionDTO> {
+        val sessionListByName = pokerSessionRepository.findByName(sessionName)
+        return sessionListByName.toList().map {
+            PokerSessionDTO(
+                    id = it.id.toString().padStart(10, '0'),
+                    name = it.name,
+                    showEstimates = it.showEstimates,
+                    userEstimates = it.userEstimates.map { ue ->
+                        UserEstimateDTO(ue)
+                    }.toMutableList()
+            )
+        }
+    }
+
     private fun getTimeFrom30MinutesAgo(): Date {
         val instance = Calendar.getInstance()
         instance.add(Calendar.MINUTE, -1)

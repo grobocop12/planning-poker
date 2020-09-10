@@ -33,4 +33,8 @@ data class PokerSession(
         var created: Date = Date(),
         @UpdateTimestamp
         var modified: Date = Date()
-)
+){
+        override fun toString(): String {
+                return "PokerSession(id=$id, name='$name', showEstimates=$showEstimates, userEstimates=$userEstimates, created=$created, modified=$modified)"
+        }
+}

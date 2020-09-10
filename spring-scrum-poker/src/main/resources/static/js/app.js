@@ -23,17 +23,17 @@ function refreshEstimates() {
     estimates["estimates"].forEach((estimate) => {
         if (estimates["showEstimates"] === true) {
             tableBody.append(
-`<tr>
+                `<tr>
 <td>${i}</td>
 <td>${estimate['userName']}</td>
 <td>${estimate['estimate'] === null ? '' : estimate['estimate']}</td>
 </tr>`)
         } else {
             tableBody.append(
-`<tr>
+                `<tr>
 <td>${i}</td>
 <td>${estimate['userName']}</td>
-<td>${estimate['estimate'] === null ? '' : '-'}</td>
+<td>${estimate['estimate'] === null ? '' : 'X'}</td>
 </tr>`)
         }
         i++;
@@ -56,12 +56,11 @@ stompClient.connect({}, () => {
         const temp = estimates['estimates'].filter((estimate) => {
             return estimate.id === userId
         })
-        if (temp.length === 1) {
-            refreshEstimates();
-            setShowButtonDescription();
-        } else {
+        if (temp.length === 0) {
             location.reload();
         }
+        refreshEstimates();
+        setShowButtonDescription();
     });
     stompClient.subscribe(`/broker/poker/${id}/show`, (msg) => {
         const state = JSON.parse(msg["body"]);
@@ -90,8 +89,8 @@ $(document).ready(() => {
             stompClient.send(`/app/poker/${id}/show`, {}, JSON.stringify({'state': !estimates['showEstimates']}))
         }
     });
-    $('#deleteButton').click(()=> {
-        stompClient.send(`/app/poker/${id}/delete`,{},{});
+    $('#deleteButton').click(() => {
+        stompClient.send(`/app/poker/${id}/delete`, {}, {});
     });
     const cards = $('.poker-card');
     cards.each((i) => {
@@ -100,4 +99,5 @@ $(document).ready(() => {
             stompClient.send(`/app/poker/${id}/vote`, {}, JSON.stringify({'userId': userId, 'userEstimate': attr}))
         }
     });
+
 })

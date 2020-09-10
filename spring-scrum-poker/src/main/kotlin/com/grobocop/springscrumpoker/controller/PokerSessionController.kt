@@ -113,6 +113,14 @@ class PokerSessionController {
         return "poker/name"
     }
 
+    @GetMapping("/search/{sessionName}")
+    fun searchSession(@PathVariable sessionName: String,
+                      model: Model): String {
+        val searchSessionByName = pokerSessionService.searchSessionByName(sessionName)
+        model.addAttribute("searchResults", searchSessionByName)
+        return "poker/search"
+    }
+
     private fun addCookie(response: HttpServletResponse, cookieName: String, value: Any) {
         val cookie = Cookie(cookieName, value.toString())
         cookie.path = cookiePath

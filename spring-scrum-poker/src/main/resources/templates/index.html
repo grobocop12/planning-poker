@@ -6,6 +6,7 @@
     <title>Planning Poker</title>
     <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <script src="/webjars/jquery/jquery.min.js"></script>
     <meta name="theme-color" content="#563d7c">
 </head>
 <body class="text-center">
@@ -30,9 +31,9 @@
                 <div class="col"></div>
                 <div class="col-8">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Session ID">
+                        <input type="text" class="form-control" id="searchBar" placeholder="Session name">
                         <div class="input-group-append">
-                            <button type="submit" class="btn btn-primary">Find</button>
+                            <button type="submit" id="searchButton" class="btn btn-primary">Find</button>
                         </div>
                     </div>
                 </div>
@@ -46,6 +47,24 @@
             <p>Planning Poker by <a th:href="@{https://grobocop.com}">Grobocop</a> 2020</p>
         </div>
     </footer>
+    <script>
+        function search() {
+            const sessionName = $('#searchBar').val().trim();
+            if (sessionName.length > 0) {
+                window.location.href = "poker/search/" +sessionName;
+            }
+        }
+        $(document).ready(() => {
+            let click = $('#searchButton').click(() => {
+                search();
+            });
+            $('#searchBar').on('keyup', (e) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    search();
+                }
+            })
+        });
+    </script>
 </div>
 </body>
 </html>

@@ -23,19 +23,12 @@ class WebsocketController {
     @Autowired
     private lateinit var service: PokerSessionService
 
-//    @Autowired
-//    private lateinit var messagingTemplate: SimpMessagingTemplate
-
     @MessageMapping("/poker/{roomId}")
     @SendTo("/broker/poker/{roomId}/listOfUsers")
     fun newConnection(@Payload user: UserEstimateDTO,
                       @DestinationVariable roomId: String): EstimatesList? {
         val readSession = service.getSession(roomId)
         readSession?.let {
-            if (!it.userEstimates.any { element -> element.id == user.id && element.userName == user.userName }) {
-                val session = service.getSession(roomId)
-                return EstimatesList(session?.showEstimates ?: false, session?.userEstimates?.toList() ?: emptyList())
-            }
             return EstimatesList(it.showEstimates, it.userEstimates.toList())
         }
         return null

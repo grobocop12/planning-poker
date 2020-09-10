@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Planning Poker</title>
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <meta name="theme-color" content="#563d7c">
+</head>
+<body>
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="masthead mb-auto text-center">
+        <h3>Planning Poker</h3>
+    </header>
+    <main role="main">
+        <div class="list-group">
+            <th:block th:each="result: ${searchResults}" >
+
+                <a class="list-group-item list-group-item-action list-group-item-action m-2"
+                   th:href="'/poker/'+${result.id}">
+                    <p th:text="${result.name}"></p>
+                    <p th:text="'number of users: '+ ${result.userEstimates.size()}"></p>
+                </a>
+
+            </th:block>
+        </div>
+    </main>
+    <footer class="mastfoot mt-auto text-center">
+        <div class="inner">
+            <p>Planning Poker by <a th:href="@{https://grobocop.com}">Grobocop</a> 2020</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

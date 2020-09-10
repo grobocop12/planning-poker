@@ -13,4 +13,5 @@ interface PokerSessionService {
     fun setSessionShowingState(roomId: String, state: Boolean): Boolean
     fun updateEstimate(userId: Int, userEstimate: String?): UserEstimateDTO
     fun deleteEstimates(roomId: String): PokerSessionDTO
+    fun searchSessionByName(sessionName: String): List<PokerSessionDTO>
 }
